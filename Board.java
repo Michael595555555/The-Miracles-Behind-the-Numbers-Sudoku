@@ -460,6 +460,7 @@ public class Board {
         if(this.checkbuttonpressed(4))
             // System.out.println("wowza");
             this.solver2();
+            
     }
 
     public void submitgame(){ //submit button
