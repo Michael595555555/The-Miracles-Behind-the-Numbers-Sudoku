@@ -10,6 +10,7 @@ public class Cell {
     double size;
     boolean isMutable;
     ArrayList<Integer> pencilmarks;
+    boolean showmark;
 
 
     public Cell(double x, double y, double size){
@@ -18,6 +19,12 @@ public class Cell {
         this.size = size;
         this.isMutable = true;
         this.pencilmarks = new ArrayList<Integer> ();
+        this.showmark = false;
+    }
+
+    public void reversemark(){
+        this.showmark = !this.showmark;
+    
     }
 
     public void drawCell(){
@@ -87,11 +94,12 @@ public class Cell {
         a -= 2;
         b -= 2;
 
-        Font font = new Font("Arial", Font.BOLD, 9);
-        StdDraw.setFont(font);
-        String numberstate = Integer.toString(num);
-        StdDraw.text(x + offset * a, y + offset * b, numberstate, 0);
-        
+        if(this.showmark){
+            Font font = new Font("Arial", Font.BOLD, 9);
+            StdDraw.setFont(font);
+            String numberstate = Integer.toString(num);
+            StdDraw.text(x + offset * a, y + offset * b, numberstate, 0);
+        }
 
     }
 

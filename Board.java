@@ -1,7 +1,9 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.lang.Math;
 import java.awt.Font;
 import java.util.Random;
+import java.util.*;
 public class Board {
 
     Cell[][] cellArr;
@@ -14,10 +16,35 @@ public class Board {
     int currentstate;
     ArrayList<Integer> currentarr;
     int n;
-    
+    ArrayList<int[]> pastmoves;
+    boolean solvenow;
+    Set <Cell[][]> workedsol;
+
     public Board(double size){
         this.drawBoard(size);
+        this.pastmoves = new ArrayList<int[]>();
         this.n=0;
+        this.solvenow = true;
+        this.workedsol = new HashSet<Cell[][]>();
+    }
+
+    public void togglemarks(){
+        for(Cell[] arr: this.cellArr){
+            for(Cell i: arr){
+                i.reversemark();
+            }
+        }
+    }
+
+    public void undo(boolean show){
+        int[] arr = pastmoves.get(pastmoves.size()-1);
+        cellArr[arr[0]][arr[1]].setState(arr[2]);
+        cellArr[arr[0]][arr[1]].drawCell();
+        cellArr[arr[0]][arr[1]].showNumber();
+        if(show){
+            StdDraw.show();
+        }
+        pastmoves.remove(pastmoves.size()-1);
     }
 
     public void drawBoard(double size){
@@ -92,11 +119,13 @@ public class Board {
             if(!state){
                 return;
             }
-            for(int i = 49; i <= 57; i++){
+            for(int i = 48; i <= 57; i++){
                 if(cellArr[currentX][currentY].getMute())
                 {
                     if(StdDraw.isKeyPressed(i)){
                         if(Checker(this.currentX, this.currentY, i-48)){
+                            int[] arr = {currentX, currentY, cellArr[this.currentX][this.currentY].getState()};
+                            this.pastmoves.add(arr);//add pastmoves
                             cellArr[this.currentX][this.currentY].setState(i - 48);
                             cellArr[this.currentX][this.currentY].drawCell();
                             cellArr[this.currentX][this.currentY].showNumber();
@@ -213,7 +242,7 @@ public class Board {
         }
         StdDraw.show();
         this.draw();
-        this.pencils();
+        // this.pencils();
         for(int i = 0; i < 9; i++){
             for(int j = 0; j < 9; j++){
                 cellArr[i][j].setWin(false);
@@ -323,45 +352,50 @@ public class Board {
 
     public void solver2()//algorithm: First 
     {
-        boolean k = true;
-        while(k == true)
-        {
-            k = false;
-            for(int j = 0; j < 9; j++)
+        System.out.println(solvenow);
+        if(this.solvenow){
+            boolean k = true;
+            while(k == true)
             {
-                for(int i = 0; i < 9; i++)
+                k = false;
+                for(int j = 0; j < 9; j++)
                 {
-                    if(cellArr[i][j].getLenMarks() == 1 && cellArr[i][j].getState() == 0){ 
-                        System.out.println("yes!");//check the size of the arraylist & state = 0
-                        StdDraw.pause(20);
-                        cellArr[i][j].setState(cellArr[i][j].getmark());
-                        cellArr[i][j].drawCell();
-                        cellArr[i][j].showNumber();
-                        k = true;
-                        this.reset();
-                        this.pencils();
-                    }
-                    else if (cellArr[i][j].getLenMarks() > 1){
-                        System.out.println("no!");
-                        if(pencilMarkIsUnique(i, j)!=0){
-                            System.out.println("wow");
+                    for(int i = 0; i < 9; i++)
+                    {
+                        if(cellArr[i][j].getLenMarks() == 1 && cellArr[i][j].getState() == 0){ 
+                            //System.out.println("yes!");//check the size of the arraylist & state = 0
                             StdDraw.pause(20);
-                            cellArr[i][j].setState(this.pencilMarkIsUnique(i, j));
+                            cellArr[i][j].setState(cellArr[i][j].getmark());
                             cellArr[i][j].drawCell();
                             cellArr[i][j].showNumber();
                             k = true;
                             this.reset();
                             this.pencils();
                         }
+                        else if (cellArr[i][j].getLenMarks() > 1){
+                            //System.out.println("no!");
+                            if(pencilMarkIsUnique(i, j)!=0){
+                                System.out.println("wow");
+                                StdDraw.pause(20);
+                                cellArr[i][j].setState(this.pencilMarkIsUnique(i, j));
+                                cellArr[i][j].drawCell();
+                                cellArr[i][j].showNumber();
+                                k = true;
+                                this.reset();
+                                this.pencils();
+                            }
+                        }
+                        StdDraw.show();
+                        //Do the exacrt same steps you did above
                     }
-                    StdDraw.show();
-                    //Do the exacrt same steps you did above
                 }
             }
+            StdDraw.pause(20);
+            System.out.println("wala!");
+            solver3();
+            this.checkbuttons();
         }
-        StdDraw.pause(20);
-        System.out.println("wala!");
-        solver3();
+        this.solvenow = false;
     } 
 
     public int pencilMarkIsUnique(int a, int b){
@@ -429,6 +463,7 @@ public class Board {
         this.makeButton(3, "Win %");
         this.makeButton(2, "Reset");
         this.makeButton(1, "Undo");
+        this.makeButton(0, "Marks");
     }
 
     public void makeButton(int a, String s){
@@ -455,12 +490,43 @@ public class Board {
     }
 
     public void checkbuttons(){
-        // if(this.checkbuttonpressed(5))
-        //     this.submitgame();
-        if(this.checkbuttonpressed(4))
-            // System.out.println("wowza");
-            this.solver2();
-            
+        if(this.checkbuttonpressed(5))
+        {
+            this.submitgame();
+
+        }
+        else if(this.checkbuttonpressed(4))
+        {
+            this.reverseai();
+        }
+        else if (this.checkbuttonpressed(1))
+        {
+            this.undo(true);
+        }
+        else if (this.checkbuttonpressed(2))
+        {
+            this.empty();
+        }
+        else if (this.checkbuttonpressed(0))
+        {
+            this.togglemarks();
+        }
+        else
+        {
+            return;
+        }
+        StdDraw.pause(300);
+    }
+
+    public void reverseai(){
+        if(solvenow)
+            this.makeButton(4, "Pause");
+        else{
+            this.makeButton(4, "AI Solve");
+            //System.out.println("wo");
+        }
+        this.solver2();
+        this.solvenow = !this.solvenow;
     }
 
     public void submitgame(){ //submit button
@@ -507,12 +573,31 @@ public class Board {
             }
         }
     }
+
+    public void empty(){
+        // int s = this.pastmoves.size();
+        // for(int i = 0; i < s; i++)
+        // {
+        //     this.undo(false);
+        //     StdDraw.show();
+        //     StdDraw.pause(300);
+        // }
+        for(Cell[] arr : this.cellArr){
+            for(Cell c : arr){
+                if(c.isMutable){
+                    c.setState(0);
+                    c.drawCell();
+                    c.showNumber();
+                }
+            }
+        }
+    }
        
     public void boardGenerator(){
         Random rand = new Random();
         randomtenintegers();
         solver();
-        for(int k = 0; k < 60; k++){
+        for(int k = 0; k < 20; k++){
             int a = rand.nextInt(9);
             int b = rand.nextInt(9);
             cellArr[a][b].setState(0);
@@ -525,11 +610,51 @@ public class Board {
     }
 
     public void update(){
-        this.checkbuttons();
         this.updateCell();
+        this.checkbuttons();
     }
-}
+    //////Probability/////////////////////////
 
+    public ArrayList<Cell> returnsol(){
+        ArrayList<Cell> omega = new ArrayList<Cell>();
+        for(Cell[] arr : this.cellArr ){
+            for(Cell c : arr){
+                omega.add(c);
+            }
+        }
+        return omega;
+    }
+    public int total(){
+        int total = 1;
+        for(Cell[] arr : this.cellArr ){
+            for(Cell c : arr){
+                total *= c.getLenMarks();
+            }
+        }
+        return total;
+    }
+
+    public void trystate(Cell c){
+        for(int i : c.possiblenum()){
+            c.setState(i);
+            this.solver2();
+        }
+
+    }
+
+    public int possibility(){
+        int sum = 0;
+        for(Cell[] arr : this.cellArr ){
+            for(Cell c : arr){
+                if(c.getState() == 0){
+                    
+                }
+            }
+        }
+        return sum;
+    }
+
+}
     
     
 

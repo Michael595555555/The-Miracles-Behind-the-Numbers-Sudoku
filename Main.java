@@ -31,6 +31,7 @@ public class Main extends Applet{
             if(board.checkbuttonpressed(7))
             {
                 board = null;
+                StdDraw.pause(125);
                 game();
             }
             // if(board.checkbuttonpressed(4))
