@@ -8,27 +8,25 @@ public class Mainpage {
     Board board;
     boolean draw;
     String difficulty;
+    ball ballone;
 
     // int score;
     int prescore;
     public Mainpage(){
         // this.score = 0;
         this.drawpage();
-        this.board = new Board(0.9, difficulty, prescore);
+        this.ball();
+        this.detector();
+        this.function();
+        
+        // this.board = new Board(0.9, difficulty, prescore);
     }
 
     public void ball(){
-        ball ballone = new ball(0.1, 0.4, 0.01, 0.02, 0.05, 1);
+        this.ballone = new ball(0.1, 0.4, 0.01, 0.02, 0.05, 1);
         StdDraw.setPenColor(StdDraw.GREEN);
         ballone.draw();
         StdDraw.setPenColor(StdDraw.BLACK);
-        while(true){
-            StdDraw.clear();
-            this.drawpage();
-            StdDraw.setPenColor(StdDraw.GREEN);
-            ballone.move();
-            StdDraw.pause(20);
-        }
     }
     public void drawpage(){
         StdDraw.clear(StdDraw.ORANGE);
@@ -143,6 +141,11 @@ public class Mainpage {
                 this.difficulty = "easy";
                 return "devil";
             }
+            StdDraw.clear();
+            this.drawpage();
+            StdDraw.setPenColor(StdDraw.GREEN);
+            ballone.move();
+            StdDraw.pause(20);
         }
 
     }

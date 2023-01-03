@@ -39,6 +39,6 @@ public class ball {
         if(ypos >= 1 - radius || ypos <= radius){
             this.yvelocity = 0 - yvelocity;
         }
-        StdDraw.show();
+        // StdDraw.show();
     }
 }

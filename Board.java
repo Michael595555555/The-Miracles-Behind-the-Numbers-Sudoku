@@ -673,7 +673,7 @@ public class Board {
             ran = 18;
         }
         else{
-            ran = 22;
+            ran = 24;
         }
         Random rand = new Random();
         randomtenintegers();

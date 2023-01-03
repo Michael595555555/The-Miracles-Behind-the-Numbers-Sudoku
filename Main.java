@@ -17,9 +17,7 @@ public class Main extends Applet{
         // makebutton("Hard", 1, 0.5);
         // game(detector());
         Mainpage mainpage = new Mainpage();
-        mainpage.drawpage();
             // StdDraw.pause(100);
-        mainpage.function();
     }
     // public static void game(String difficulty)
     // {
