@@ -8,6 +8,7 @@ public class Board {
 
     Cell[][] cellArr;
     Cell currentcell;
+    Mainpage board;
     double size;
     int currentX;
     int currentY;
@@ -19,13 +20,50 @@ public class Board {
     ArrayList<int[]> pastmoves;
     boolean solvenow;
     Set <Cell[][]> workedsol;
-
-    public Board(double size){
+    boolean winstate;
+    String dif;
+    int score;
+    public Board(double size, String difficulty, int score){
+        StdDraw.clear(StdDraw.BOOK_BLUE);
         this.drawBoard(size);
         this.pastmoves = new ArrayList<int[]>();
         this.n=0;
         this.solvenow = true;
         this.workedsol = new HashSet<Cell[][]>();
+        this.dif = difficulty;
+        this.score = score;
+    }
+
+    public void setwinstate(boolean f){
+        this.winstate = f;
+    }
+    
+    public int getscore(){
+        return this.score;
+    }
+
+    public void setscore(){
+       this.score++;
+    }
+
+    public void score(int m){
+        this.drawblue();
+        StdDraw.setPenColor(StdDraw.RED);
+        String get = Integer.toString(m);
+        Font font = new Font("ARIAL", Font.BOLD, 40);
+        StdDraw.setFont(font);
+        double x = cellArr[8][8].getXpos();
+        double y = cellArr[8][8].getYpos();
+        String s = "Score: " + get;
+        StdDraw.text(x + 0.3, y, s, 0);
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.show();
+    }
+
+    public void goback(){
+        StdDraw.clear();
+        Mainpage mainpage = new Mainpage(); 
+        mainpage.function();
     }
 
     public void togglemarks(){
@@ -276,6 +314,10 @@ public class Board {
                             else{
                                 this.cellArr[i][j].setState(0);
                             }
+                            this.checkbuttons();
+                            if(!this.solvenow){
+                                return true;
+                            }
                         }
                     }
                     return false;
@@ -300,6 +342,13 @@ public class Board {
         return true;
     }
 
+    public boolean checkgame(){
+        if(this.tester()){
+           return true;
+        }
+        return false;
+    }
+
     public void showtest(){
         double m = StdDraw.mouseX();
         double n = StdDraw.mouseY();
@@ -312,12 +361,13 @@ public class Board {
             {
                 if(this.tester()){
                     this.drawblue();
+                    this.winstate = true;
+                    this.endgame();
                     StdDraw.setPenColor(StdDraw.GREEN);
                     Font font = new Font("Time New Roman", Font.BOLD, 40);
                     StdDraw.setFont(font);
                     String s = "Great job!";
                     StdDraw.text(x + 0.3, y, s, 0);
-                    this.endgame();
                 }
                 else{
                     this.drawblue();
@@ -331,6 +381,14 @@ public class Board {
             }
         }
     }
+
+    // public void newgame(){
+    //     StdDraw.clear();
+    //     StdDraw.pause(125);
+    //     Mainpage mainpage = new Mainpage();
+    //     mainpage.game(dif, score);
+        
+    // }
     
 
     public void endgame(){
@@ -353,49 +411,47 @@ public class Board {
     public void solver2()//algorithm: First 
     {
         System.out.println(solvenow);
-        if(this.solvenow){
-            boolean k = true;
-            while(k == true)
+        
+        boolean k = true;
+        while(k == true)
+        {
+            k = false;
+            for(int j = 0; j < 9; j++)
             {
-                k = false;
-                for(int j = 0; j < 9; j++)
+                for(int i = 0; i < 9; i++)
                 {
-                    for(int i = 0; i < 9; i++)
-                    {
-                        if(cellArr[i][j].getLenMarks() == 1 && cellArr[i][j].getState() == 0){ 
-                            //System.out.println("yes!");//check the size of the arraylist & state = 0
+                    if(cellArr[i][j].getLenMarks() == 1 && cellArr[i][j].getState() == 0){ 
+                        //System.out.println("yes!");//check the size of the arraylist & state = 0
+                        StdDraw.pause(20);
+                        cellArr[i][j].setState(cellArr[i][j].getmark());
+                        cellArr[i][j].drawCell();
+                        cellArr[i][j].showNumber();
+                        k = true;
+                        this.reset();
+                        this.pencils();
+                    }
+                    else if (cellArr[i][j].getLenMarks() > 1){
+                        //System.out.println("no!");
+                        if(pencilMarkIsUnique(i, j)!=0){
+                            System.out.println("wow");
                             StdDraw.pause(20);
-                            cellArr[i][j].setState(cellArr[i][j].getmark());
+                            cellArr[i][j].setState(this.pencilMarkIsUnique(i, j));
                             cellArr[i][j].drawCell();
                             cellArr[i][j].showNumber();
                             k = true;
                             this.reset();
                             this.pencils();
                         }
-                        else if (cellArr[i][j].getLenMarks() > 1){
-                            //System.out.println("no!");
-                            if(pencilMarkIsUnique(i, j)!=0){
-                                System.out.println("wow");
-                                StdDraw.pause(20);
-                                cellArr[i][j].setState(this.pencilMarkIsUnique(i, j));
-                                cellArr[i][j].drawCell();
-                                cellArr[i][j].showNumber();
-                                k = true;
-                                this.reset();
-                                this.pencils();
-                            }
-                        }
-                        StdDraw.show();
-                        //Do the exacrt same steps you did above
                     }
+                    StdDraw.show();
+                    //Do the exacrt same steps you did above
                 }
             }
-            StdDraw.pause(20);
-            System.out.println("wala!");
-            solver3();
-            this.checkbuttons();
         }
-        this.solvenow = false;
+        StdDraw.pause(20);
+        System.out.println("wala!");
+        this.solver3();
+        this.checkbuttons();
     } 
 
     public int pencilMarkIsUnique(int a, int b){
@@ -403,7 +459,7 @@ public class Board {
         int XUpperbound = a - a % 3 + 3;
         int Ylowerbound = b - b % 3;
         int YUpperbound = b - b % 3 + 3;
-       for(int i : cellArr[a][b].possiblenum()){ //looping through
+        for(int i : cellArr[a][b].possiblenum()){ //looping through
            //checkingrows
            int counter = 0;
            for(int j = 0; j < 9; j++)
@@ -457,7 +513,7 @@ public class Board {
 
     public void makeallbuttons(){
         this.makeButton(7, "New Game");
-        this.makeButton(6, "Hint");
+        this.makeButton(6, "Home");
         this.makeButton(5, "Submit");
         this.makeButton(4, "AI Solve");
         this.makeButton(3, "Win %");
@@ -490,11 +546,17 @@ public class Board {
     }
 
     public void checkbuttons(){
-        if(this.checkbuttonpressed(5))
-        {
-            this.submitgame();
-
+        // if(this.checkbuttonpressed(7)){
+        //     this.newgame();
+        // }
+        if(this.checkbuttonpressed(6)){
+            this.goback();
         }
+        // if(this.checkbuttonpressed(5))
+        // {
+        //     this.submitgame();
+
+        // }
         else if(this.checkbuttonpressed(4))
         {
             this.reverseai();
@@ -533,22 +595,28 @@ public class Board {
         double x = cellArr[8][8].getXpos();
         double y = cellArr[8][8].getYpos();
         if(this.tester()){
-            this.drawblue();
-            StdDraw.setPenColor(StdDraw.GREEN);
-            Font font = new Font("Time New Roman", Font.BOLD, 40);
-            StdDraw.setFont(font);
-            String s = "Great job!";
-            StdDraw.text(x + 0.3, y, s, 0);
+            // this.drawblue();
+            // StdDraw.setPenColor(StdDraw.GREEN);
+            // Font font = new Font("Time New Roman", Font.BOLD, 40);
+            // StdDraw.setFont(font);
+            // String s = "Great job!";
+            // StdDraw.text(x + 0.3, y, s, 0);
             this.endgame();
+            this.setscore();
+            System.out.println(this.score);
+            this.score(this.score);
+            StdDraw.pause(100);
+            Mainpage mainpage = new Mainpage();
+            mainpage.game(this.dif);
         }
-        else{
-            this.drawblue();
-            StdDraw.setPenColor(StdDraw.RED);
-            Font font = new Font("Time New Roman", Font.BOLD, 40);
-            StdDraw.setFont(font);
-            String k = "Keep trying!";
-            StdDraw.text(x + 0.3, y, k, 0);
-        }
+        // else{
+        //     // this.drawblue();
+        //     // StdDraw.setPenColor(StdDraw.RED);
+        //     // Font font = new Font("Time New Roman", Font.BOLD, 40);
+        //     // StdDraw.setFont(font);
+        //     // String k = "Keep trying!";
+        //     // StdDraw.text(x + 0.3, y, k, 0);
+        // }
     }
 
     public boolean occur(int a, ArrayList<Integer> b){
@@ -594,10 +662,23 @@ public class Board {
     }
        
     public void boardGenerator(){
+        int ran = 0;
+        if(this.dif.equals("easy")){
+            ran = 6;
+        }
+        else if(this.dif.equals("medium")){
+            ran = 12;
+        }
+        else if(this.dif.equals("hard")){
+            ran = 18;
+        }
+        else{
+            ran = 22;
+        }
         Random rand = new Random();
         randomtenintegers();
         solver();
-        for(int k = 0; k < 20; k++){
+        for(int k = 0; k < 5 * ran; k++){
             int a = rand.nextInt(9);
             int b = rand.nextInt(9);
             cellArr[a][b].setState(0);
@@ -628,7 +709,8 @@ public class Board {
         int total = 1;
         for(Cell[] arr : this.cellArr ){
             for(Cell c : arr){
-                total *= c.getLenMarks();
+                if(c.getLenMarks() > 0)
+                    total *= c.getLenMarks();
             }
         }
         return total;
@@ -642,12 +724,16 @@ public class Board {
 
     }
 
-    public int possibility(){
+    public int combinations(){
         int sum = 0;
         for(Cell[] arr : this.cellArr ){
             for(Cell c : arr){
                 if(c.getState() == 0){
-                    
+                    //recursively call the solver function after finish trying one number in the empty cells.
+                    //put in a set which ensures no duplicates.
+                    //end after going through all the cells.
+                    //Count the # of items in the hashset and divide it by the total number of variations. 
+                    //Multiply this by ten to get the winning percentage.
                 }
             }
         }
