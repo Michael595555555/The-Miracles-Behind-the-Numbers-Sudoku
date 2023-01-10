@@ -23,6 +23,7 @@ public class Board {
     boolean winstate;
     String dif;
     int score;
+    int numofsol;
     public Board(double size, String difficulty, int score){
         StdDraw.clear(StdDraw.BOOK_BLUE);
         this.drawBoard(size);
@@ -32,6 +33,7 @@ public class Board {
         this.workedsol = new HashSet<Cell[][]>();
         this.dif = difficulty;
         this.score = score;
+        this.numofsol = 0;
     }
 
     public void setwinstate(boolean f){
@@ -250,7 +252,7 @@ public class Board {
     /////////Checker/////////////////////////////////////////////////
 
    
-    public boolean solver(){ //AI solver
+    public boolean solver(boolean create){ //AI solver
         for(int j = 0; j < 9; j++)
         {
             for(int i = 0; i < 9; i++)
@@ -265,7 +267,7 @@ public class Board {
                             //this.cellArr[i][j].drawCell();
                             this.cellArr[i][j].setState(x);
                             // this.cellArr[i][j].showNumber();
-                            if(this.solver())
+                            if(this.solver(create))
                             {
                                 return true;
                             }
@@ -278,15 +280,19 @@ public class Board {
                 }
             }    
         }
-        StdDraw.show();
-        this.draw();
-        // this.pencils();
-        for(int i = 0; i < 9; i++){
-            for(int j = 0; j < 9; j++){
-                cellArr[i][j].setWin(false);
+        if(create){
+            StdDraw.show();
+            this.draw();
+            // this.pencils();
+            for(int i = 0; i < 9; i++){
+                for(int j = 0; j < 9; j++){
+                    cellArr[i][j].setWin(false);
+                }
             }
+            return true;
         }
-        return true;
+        this.numofsol++;
+        return false;
 
     }
 
@@ -516,10 +522,9 @@ public class Board {
         this.makeButton(6, "Home");
         this.makeButton(5, "Submit");
         this.makeButton(4, "AI Solve");
-        this.makeButton(3, "Win %");
-        this.makeButton(2, "Reset");
-        this.makeButton(1, "Undo");
-        this.makeButton(0, "Marks");
+        this.makeButton(3, "Reset");
+        this.makeButton(2, "Undo");
+        this.makeButton(1, "Marks");
     }
 
     public void makeButton(int a, String s){
@@ -528,7 +533,7 @@ public class Board {
         StdDraw.setPenColor(StdDraw.GRAY);
         StdDraw.filledRectangle(x + 0.3, y, 0.1, 0.04);
         StdDraw.setPenColor(StdDraw.BLACK);
-        Font font = new Font("Time New Roman", Font.BOLD, 30);
+        Font font = new Font("ARIAL", Font.BOLD, 30);
         StdDraw.setFont(font);
         StdDraw.text(x + 0.3, y, s, 0);
     }
@@ -557,19 +562,25 @@ public class Board {
         //     this.submitgame();
 
         // }
+    
         else if(this.checkbuttonpressed(4))
         {
             this.reverseai();
         }
-        else if (this.checkbuttonpressed(1))
+        // else if(this.checkbuttonpressed(3)){
+        //     System.out.println("total is" + this.total());
+        //     this.solver(false);
+        //     System.out.println(this.numofsol);
+        // }
+        else if (this.checkbuttonpressed(2))
         {
             this.undo(true);
         }
-        else if (this.checkbuttonpressed(2))
+        else if (this.checkbuttonpressed(3))
         {
             this.empty();
         }
-        else if (this.checkbuttonpressed(0))
+        else if (this.checkbuttonpressed(1))
         {
             this.togglemarks();
         }
@@ -589,6 +600,12 @@ public class Board {
         }
         this.solver2();
         this.solvenow = !this.solvenow;
+    }
+
+    public void winningpercentage(){
+        double xcord = cellArr[8][0].getXpos() + 0.3;
+        double ycord = cellArr[8][0].getYpos();
+        StdDraw.text(xcord, ycord, numofsol + " out of " + this.total());
     }
 
     public void submitgame(){ //submit button
@@ -675,9 +692,10 @@ public class Board {
         else{
             ran = 24;
         }
+        System.out.println(ran);
         Random rand = new Random();
         randomtenintegers();
-        solver();
+        solver(true);
         for(int k = 0; k < 5 * ran; k++){
             int a = rand.nextInt(9);
             int b = rand.nextInt(9);
@@ -691,6 +709,7 @@ public class Board {
     }
 
     public void update(){
+        this.winningpercentage();
         this.updateCell();
         this.checkbuttons();
     }
@@ -705,8 +724,8 @@ public class Board {
         }
         return omega;
     }
-    public int total(){
-        int total = 1;
+    public long total(){
+        long total = 1;
         for(Cell[] arr : this.cellArr ){
             for(Cell c : arr){
                 if(c.getLenMarks() > 0)
@@ -724,21 +743,21 @@ public class Board {
 
     }
 
-    public int combinations(){
-        int sum = 0;
-        for(Cell[] arr : this.cellArr ){
-            for(Cell c : arr){
-                if(c.getState() == 0){
-                    //recursively call the solver function after finish trying one number in the empty cells.
-                    //put in a set which ensures no duplicates.
-                    //end after going through all the cells.
-                    //Count the # of items in the hashset and divide it by the total number of variations. 
-                    //Multiply this by ten to get the winning percentage.
-                }
-            }
-        }
-        return sum;
-    }
+    // public int combinations(){
+    //     int sum = 0;
+    //     for(Cell[] arr : this.cellArr ){
+    //         for(Cell c : arr){
+    //             if(c.getState() == 0){
+    //                 //recursively call the solver function after finish trying one number in the empty cells.
+    //                 //put in a set which ensures no duplicates.
+    //                 //end after going through all the cells.
+    //                 //Count the # of items in the hashset and divide it by the total number of variations. 
+    //                 //Multiply this by ten to get the winning percentage.
+    //             }
+    //         }
+    //     }
+    //     return sum;
+    // }
 
 }
     

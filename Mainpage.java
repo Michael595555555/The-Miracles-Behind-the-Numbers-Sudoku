@@ -58,10 +58,8 @@ public class Mainpage {
     {
         this.board=new Board(0.9, this.difficulty, this.prescore);
         board.boardGenerator();
-        System.out.println("beforeset");
         board.score(this.prescore);
         System.out.println(this.prescore);
-        System.out.println("afterset");
         board.makeallbuttons(); 
         // board.pencils();
         // StdDraw.show();
@@ -127,25 +125,25 @@ public class Mainpage {
         while(true){
             if(detect(0.3, 0.63)){
                 this.difficulty = "easy";
-                return "easy";
             }
             else if(detect(0.6, 0.63)){
-                this.difficulty = "easy";
-                return "medium";
+                this.difficulty = "medium";
             }
             else if(detect(0.9, 0.63)){
-                this.difficulty = "easy";
-                return "hard";
+                this.difficulty = "hard";
             }
             else if(detect(1.2, 0.63)){
-                this.difficulty = "easy";
-                return "devil";
+                this.difficulty = "devil";
             }
-            StdDraw.clear();
-            this.drawpage();
-            StdDraw.setPenColor(StdDraw.GREEN);
-            ballone.move();
-            StdDraw.pause(20);
+            else{
+                StdDraw.clear();
+                this.drawpage();
+                StdDraw.setPenColor(StdDraw.GREEN);
+                ballone.move();
+                StdDraw.pause(20);
+                continue;
+            }
+            return(this.difficulty);
         }
 
     }
