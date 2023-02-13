@@ -52,7 +52,7 @@ public class Board {
         this.drawblue();
         StdDraw.setPenColor(StdDraw.RED);
         String get = Integer.toString(m);
-        Font font = new Font("ARIAL", Font.BOLD, 40);
+        Font font = new Font("ARIAL", Font.BOLD, 30);
         StdDraw.setFont(font);
         double x = cellArr[8][8].getXpos();
         double y = cellArr[8][8].getYpos();
@@ -186,6 +186,7 @@ public class Board {
                 }
             }
             StdDraw.show();
+            this.winningpercentage();
             }
         
     
@@ -370,7 +371,7 @@ public class Board {
                     this.winstate = true;
                     this.endgame();
                     StdDraw.setPenColor(StdDraw.GREEN);
-                    Font font = new Font("Time New Roman", Font.BOLD, 40);
+                    Font font = new Font("Time New Roman", Font.BOLD, 30);
                     StdDraw.setFont(font);
                     String s = "Great job!";
                     StdDraw.text(x + 0.3, y, s, 0);
@@ -378,7 +379,7 @@ public class Board {
                 else{
                     this.drawblue();
                     StdDraw.setPenColor(StdDraw.RED);
-                    Font font = new Font("Time New Roman", Font.BOLD, 40);
+                    Font font = new Font("Time New Roman", Font.BOLD, 30);
                     StdDraw.setFont(font);
                     String k = "Keep trying!";
                     StdDraw.text(x + 0.3, y, k, 0);
@@ -407,11 +408,12 @@ public class Board {
         }
     }
     public void drawblue(){
-        double x = cellArr[8][8].getXpos();
-        double y = cellArr[8][8].getYpos();
+        double x = cellArr[8][0].getXpos();
+        double y = cellArr[8][0].getYpos();
         StdDraw.setPenColor(StdDraw.BOOK_BLUE);
-        StdDraw.filledRectangle(x + 0.3, y, 0.16, 0.04);
-
+        StdDraw.filledRectangle(x + 0.3, y, 0.25, 0.04);
+        StdDraw.setPenColor(StdDraw.BLACK);
+        
     }
 
     public void solver2()//algorithm: First 
@@ -603,9 +605,18 @@ public class Board {
     }
 
     public void winningpercentage(){
-        double xcord = cellArr[8][0].getXpos() + 0.3;
+        this.drawblue();
+        this.solver(false);
+        double xleft = cellArr[8][0].getXpos() + 0.15;
         double ycord = cellArr[8][0].getYpos();
-        StdDraw.text(xcord, ycord, numofsol + " out of " + this.total());
+        double xright = cellArr[8][0].getXpos() + 0.45;
+        StdDraw.setPenColor(StdDraw.RED);
+        Font font = new Font("ARIAL", Font.BOLD, 30);
+        StdDraw.setFont(font);
+        StdDraw.text(xleft + 0.15, ycord + 0.025, this.numofsol + " out of");
+        StdDraw.text(xleft + 0.15, ycord - 0.025, Long.toString(this.total()));
+        StdDraw.setPenColor(StdDraw.BLACK);
+        this.numofsol = 0;
     }
 
     public void submitgame(){ //submit button
@@ -709,7 +720,6 @@ public class Board {
     }
 
     public void update(){
-        this.winningpercentage();
         this.updateCell();
         this.checkbuttons();
     }
